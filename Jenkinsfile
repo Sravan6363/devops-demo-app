@@ -13,6 +13,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn clean package'
+                sh 'echo "===== TARGET DIRECTORY ====="'
+                sh 'ls -lah target/'
             }
         }
 
@@ -25,7 +27,7 @@ pipeline {
         stage('Archive WAR') {
             steps {
                 archiveArtifacts artifacts: 'target/*.war',
-                             fingerprint: true
+                                 fingerprint: true
             }
         }
     }
