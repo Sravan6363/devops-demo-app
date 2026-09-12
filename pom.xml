@@ -9,6 +9,9 @@
     <artifactId>devops-demo-app</artifactId>
     <version>1.0</version>
 
+    <!-- Build a WAR instead of the default JAR -->
+    <packaging>war</packaging>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
