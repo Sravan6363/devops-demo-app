@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'sravan1305/devops-demo-app'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -47,29 +51,47 @@ pipeline {
             }
         }
 
-        stage('Deploy to Tomcat') {
+        stage('Docker Build') {
             steps {
-                deploy adapters: [
-                    tomcat9(
-                        credentialsId: 'tomcat-credentials',
-                        url: 'http://172.31.70.61:8080'
+                sh '''
+                    docker build \
+                    -t ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                    -t ${DOCKER_IMAGE}:latest .
+                '''
+            }
+        }
+
+        stage('Docker Hub Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
                     )
-                ],
-                contextPath: 'devops-demo-app',
-                war: 'target/devops-demo-app.war'
+                ]) {
+                    sh '''
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                            -u "$DOCKERHUB_USERNAME" \
+                            --password-stdin
+
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
+
+                        docker logout
+                    '''
+                }
             }
         }
     }
 
     post {
-
         success {
-            echo 'CI Pipeline completed successfully!!!'
+            echo 'CI/CD Pipeline completed successfully!!!'
         }
 
         failure {
-            echo 'CI Pipeline failed!'
+            echo 'CI/CD Pipeline failed!'
         }
-
     }
 }
