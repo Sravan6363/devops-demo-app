@@ -46,6 +46,19 @@ pipeline {
                                  fingerprint: true
             }
         }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                deploy adapters: [
+                    tomcat9(
+                        credentialsId: 'tomcat-credentials',
+                        url: 'http://172.31.70.61:8080'
+                    )
+                ],
+                contextPath: 'devops-demo-app',
+                war: 'target/devops-demo-app.war'
+            }
+        }
     }
 
     post {
