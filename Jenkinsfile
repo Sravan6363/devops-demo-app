@@ -27,7 +27,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh 'mvn sonar:sonar'
+                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
                 }
             }
         }
@@ -51,7 +51,7 @@ pipeline {
     post {
 
         success {
-            echo 'CI Pipeline completed successfully!!!!!!'
+            echo 'CI Pipeline completed successfully!!!'
         }
 
         failure {
